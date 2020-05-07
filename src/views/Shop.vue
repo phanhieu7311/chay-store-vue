@@ -44,19 +44,19 @@
 							<div class="rs2-select2 bo4 of-hidden w-size12 m-t-5 m-b-5 m-r-10">
 								<select class="selection-2" name="sorting" v-model="price">
 									<option value="">Tất cả</option>
-									<option>Dưới 1 triệu</option>
-									<option>Từ 1 triệu đến 2 triệu</option>
-									<option>Trên 2 triệu</option>
+									<option value='{"price":{"<":1000000}}'>Dưới 1 triệu</option>
+									<option value='{"price":{">=":1000000,"<=":2000000}}'>Từ 1 triệu đến 2 triệu</option>
+									<option value='{"price":{">":2000000}}'>Trên 2 triệu</option>
 								</select>
 							</div>
 
 							<div class="rs2-select2 bo4 of-hidden w-size12 m-t-5 m-b-5 m-r-10">
-								<select class="selection-2" name="sorting">
-									<option>--- Sắp xếp ---</option>
-									<option>Mới nhất</option>
-									<option>Cũ nhất</option>
-									<option>Giá thấp đến cao</option>
-									<option>Giá cao đến thấp</option>
+								<select class="selection-2" name="sorting" v-model="orderBy">
+									<!-- <option value="">--- Sắp xếp ---</option> -->
+									<option value="created DESC">Mới nhất</option>
+									<option value="created ASC">Cũ nhất</option>
+									<option value="price ASC">Giá thấp đến cao</option>
+									<option value="price DESC">Giá cao đến thấp</option>
 
 								</select>
 							</div>
@@ -107,6 +107,7 @@ export default {
 			page: 1,
 			allPage: 0,
 			price: '',
+			orderBy: 'created DESC'
 		}
 	},
 	components: {
@@ -118,14 +119,14 @@ export default {
 		},
 		async getProduct(){
 			if(!this.brand_id){
-				await axios.get('/api/product/getAll?page='+this.page)
+				await axios.get('/api/product/getAll?page='+this.page+'&orderBy='+this.orderBy+'&price='+this.price)
 					.then(response => {
 						this.listProd = response.data.products;
 						this.allProd = response.data.allProd;
 					})
 			} else if (this.brand_id != -1) {
 				this.page = 1;
-				await axios.get('/api/product/getFromBrand?brand_id='+this.brand_id+'&page='+this.page)
+				await axios.get('/api/product/getFromBrand?brand_id='+this.brand_id+'&page='+this.page+'&orderBy='+this.orderBy+'&price='+this.price)
 					.then(response => {
 						this.listProd = response.data.products;
 						this.allProd = response.data.allProd;
@@ -150,10 +151,21 @@ export default {
 			this.page = page;
 			this.getProduct();
 		},
-		
+		getProdByPrice () {
+			axios.get('/api/product/getFromPrice')
+				.then(response => {
+					this.listBrand = response.data.listBrand;
+				})
+		}
 	},
 	watch:{
 		brand_id(){
+			this.getProduct();
+		},
+		orderBy () {
+			this.getProduct();
+		},
+		price () {
 			this.getProduct();
 		}
 	},

@@ -18,6 +18,7 @@
               </div>
             </span>
           </div>
+          <small class="small-alert" id="name-failed">*Tên người nhận không được bỏ trống</small>
           <div class="flex-w flex-sb-m p-b-12">
             <span class="s-text18 w-size19 w-full-sm title">
               SĐT người nhận:
@@ -28,6 +29,7 @@
               </div>
             </span>
           </div>
+          <small class="small-alert" id="phone-failed">*Số điện thoại không hợp lệ</small>
           <div class="flex-w flex-sb-m p-b-12">
             <span class="s-text18 w-size19 w-full-sm title">
               Địa chỉ nhận:
@@ -38,6 +40,7 @@
               </div>
             </span>
           </div>
+          <small class="small-alert" id="address-failed">*Địa chỉ nhận hàng không được bỏ trống</small>
           <div class="flex-w flex-sb-m p-b-12" style="margin-bottom:20px">
             <span class="s-text18 w-size19 w-full-sm title">
               Ghi chú:
@@ -71,7 +74,7 @@
         <div class=" bo10">
           <div class="flex-w flex-sb p-t-15 p-b-20" v-for="item in cart" :key="item.key">
             <span class="s-text18 w-size20 w-full-sm">
-              {{item.name}} ({{item.size.size}}) x {{item.quantity}}
+              {{item.name}} ({{item.size}}) x {{item.quantity}}
             </span>
             <span class="s-text18 w-size19 w-full-sm">
                 {{formatMoney(moneyToInt(item.price) * item.quantity)}}
@@ -116,10 +119,14 @@ export default {
         phone: '',
         address: '',
         note: ''
-      }
+      },
+      user: {}
     }
   },
   methods: {
+    loadCookie () {
+      this.user = this.$cookies.get('user')
+    },
     loadSession(){
 			Object.keys(this.$session.getAll()).forEach(key => {
 				if(key != 'session-id' && key != 'cartCount'){
@@ -138,33 +145,63 @@ export default {
 			return price.toLocaleString('en-US', { style: 'currency', currency: 'VND' });
     },
     async submitForm(){
-      let bill = {};
-      await axios.post('/api/bill/create',{
-        'user_id':null,
-        'customer': this.customer.name,
-        'address': this.customer.address,
-        'phone': this.customer.phone,
-        'note': this.customer.note,
-      }).then(function(response){
-        bill = response.data;
-      })
-      this.cart.forEach(async item => {
-        await axios.post('/api/bill/createDetail',{
-          'bill_id': bill.id,
-          'quantity': item.quantity,
-          'product_id': item.id,
-          'size': item.size
+      let userId = this.user ? this.user.id : null;
+      let err = false;
+      if (!this.validatePhone(this.customer.phone)) {
+        document.getElementById('phone-failed').style.display = 'block';
+        err = true;
+      } else {
+        document.getElementById('phone-failed').style.display = 'none';
+      } 
+      if (this.customer.address.length == 0) {
+        document.getElementById('address-failed').style.display = 'block';
+        err = true;
+      } else {
+        document.getElementById('address-failed').style.display = 'none';
+      } 
+      if (this.customer.name.length == 0) {
+        document.getElementById('name-failed').style.display = 'block';
+        err = true;
+      } else {
+        document.getElementById('name-failed').style.display = 'none';
+      } 
+
+      if (!err) {
+        let bill = {};
+        await axios.post('/api/bill/create',{
+          'user_id':userId,
+          'customer': this.customer.name,
+          'address': this.customer.address,
+          'phone': this.customer.phone,
+          'note': this.customer.note,
+        }).then(function(response){
+          bill = response.data;
         })
-      });
-      this.$router.push('/success');
-      this.$session.clear();
+        this.cart.forEach(async item => {
+          await axios.post('/api/bill/createDetail',{
+            'bill_id': bill.id,
+            'quantity': item.quantity,
+            'product_id': item.id,
+            'size': item.size
+          })
+        });
+        this.$router.push('/success');
+        this.$session.clear();
+        this.$session.set('cartCount', 0);
+				this.$bus.emit('updateCart', this.$session.get('cartCount'));
+      }
     },
-    validateForm () {
-      
-    }
+    validatePhone (phone) {
+      let vnf_regex = /((09|03|07|08|05)+([0-9]{8})\b)/g;
+      if (vnf_regex.test(phone)) {
+        return true;
+      }
+      return false;
+    },
   },
   beforeMount(){
     this.loadSession();
+    this.loadCookie();
   }
 }
 </script>
@@ -196,5 +233,11 @@ export default {
 .butt{
   width:300px;
   margin-left: 27%
+}
+.small-alert{
+  color: red;
+  margin-left: 225px;
+  margin-top: -25px;
+  display: none;
 }
 </style>

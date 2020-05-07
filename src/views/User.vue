@@ -46,9 +46,11 @@
             Đổi mật khẩu
           </span>
         </router-link>
-        <span class="flex-c-m sizefull bg1 bo-rad-23 hov1 s-text1 trans-0-4 butt cs-pointer butt">
-          Lịch sử đơn hàng
-        </span>
+        <router-link to="/history">
+          <span class="flex-c-m sizefull bg1 bo-rad-23 hov1 s-text1 trans-0-4 butt cs-pointer butt">
+            Lịch sử đơn hàng
+          </span>
+        </router-link>
       </div>
   </div>
 </template>

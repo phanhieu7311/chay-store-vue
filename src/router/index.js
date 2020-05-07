@@ -12,6 +12,7 @@ import SignUp from '../views/SignUp.vue'
 import User from '../views/User.vue'
 import EditUser from '../views/EditUser.vue'
 import ChangePassword from '../views/ChangePassword.vue'
+import History from '../views/History.vue'
 
 Vue.use(VueRouter)
 
@@ -75,6 +76,11 @@ const routes = [
     path: '/user/changePassword',
     name: 'changPassword',
     component: ChangePassword
+  },
+  {
+    path: '/history',
+    name: 'history',
+    component: History
   },
 ]
 

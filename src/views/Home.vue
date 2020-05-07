@@ -85,7 +85,7 @@
 
 						<div class="block2-content sizefull ab-t-l flex-col-c-m">
 							<h4 class="m-text4 t-center w-size3 p-b-8">
-								Sign up & get 20% off
+								Sign up & get new notifications
 							</h4>
 
 							<p class="t-center w-size4">
@@ -94,9 +94,11 @@
 
 							<div class="w-size2 p-t-25">
 								<!-- Button -->
+								<router-link to='/signup'>
 								<a href="#" class="flex-c-m size2 bg4 bo-rad-23 hov1 m-text3 trans-0-4">
 									Sign Up
 								</a>
+								</router-link>
 							</div>
 						</div>
 					</div>

@@ -10,9 +10,9 @@
 
 					<div class="block2-btn-addcart w-size1 trans-0-4">
 						<!-- Button -->
-						<router-link to="/cart">
+						<router-link :to="{path:'/product-detail', query: {product_id: this.data.id}}">
 						<button class="flex-c-m size1 bg4 bo-rad-23 hov1 s-text1 trans-0-4">
-							Thêm vào giỏ
+							Chi tiết sản phẩm
 						</button>
 						</router-link>
 					</div>

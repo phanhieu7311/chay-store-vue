@@ -96,18 +96,21 @@
 
 					<div class="size15 trans-0-4">
 						<!-- Button -->
-						<router-link to="/checkout">
-							<button class="flex-c-m sizefull bg1 bo-rad-23 hov1 s-text1 trans-0-4">
-								Đặt hàng
-							</button>
-						</router-link>
+						<button class="flex-c-m sizefull bg1 bo-rad-23 hov1 s-text1 trans-0-4" @click="checkCart">
+							Đặt hàng
+						</button>
 					</div>
 				</div>
 			</div>
 		</section>
+		
+		<div class="alert alert-danger" id="uniq-failed" role="alert">
+			Chưa có sản phẩm nào trong giỏ hàng
+		</div>
 	</div>
 </template>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/core.js"></script>
 <script>
 export default {
 	name:'cart',
@@ -166,13 +169,21 @@ export default {
 					keys.splice(i , 1);
 				}
 			}
-			// console.log(item+' '+keys[index])
-			// console.log(keys)
 			this.total -= this.moneyToInt(this.cart[index].price) * this.cart[index].quantity;
 			this.$session.remove(keys[index]);
 			this.cart.splice(index,1);
 			await this.$session.set('cartCount',this.$session.get('cartCount')-1);
 			this.$bus.emit('updateCart', this.$session.get('cartCount'));
+		},
+		checkCart () {
+			if(this.cart.length > 0) {
+				this.$router.push('/checkout');
+			} else {
+				document.getElementById('uniq-failed').style.display = 'block';
+				setTimeout(function() {
+					$('#uniq-failed').fadeOut(1000)
+				}, 3000)
+			}
 		}
 	},
 	beforeMount(){
@@ -180,3 +191,13 @@ export default {
 	}
 }
 </script>
+
+<style scoped>
+.alert{
+  position: fixed;
+	width: 200px;
+	top: 100px;
+	right: 10px;
+	display: none;
+}
+</style>
