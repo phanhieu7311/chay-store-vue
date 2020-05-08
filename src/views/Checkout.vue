@@ -129,7 +129,7 @@ export default {
     },
     loadSession(){
 			Object.keys(this.$session.getAll()).forEach(key => {
-				if(key != 'session-id' && key != 'cartCount'){
+				if(key != 'session-id' && key != 'cartCount' && key != 'billId'){
 					this.cart.push(this.$session.get(key));
 					let price = this.$session.get(key).price;
 					this.total += this.moneyToInt(price) * this.$session.get(key).quantity;
@@ -178,16 +178,22 @@ export default {
           bill = response.data;
         })
         this.cart.forEach(async item => {
-          await axios.post('/api/bill/createDetail',{
+          axios.post('/api/bill/createDetail',{
             'bill_id': bill.id,
             'quantity': item.quantity,
             'product_id': item.id,
             'size': item.size
           })
+          axios.post('/api/storage/decrement',{
+            "product_id":item.id,
+            "size":item.size,
+            "quantity":item.quantity
+          })
         });
         this.$router.push('/success');
         this.$session.clear();
         this.$session.set('cartCount', 0);
+        this.$session.set('billId', bill.id);
 				this.$bus.emit('updateCart', this.$session.get('cartCount'));
       }
     },

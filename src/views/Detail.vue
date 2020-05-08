@@ -103,6 +103,9 @@
 					<div class="alert alert-danger" id="failed" role="alert">
 						Xin vui lòng chọn size
 					</div>
+					<div class="alert alert-danger" id="size-fail" role="alert">
+						Số lượng sản phẩm không đủ
+					</div>
 
 				</div>
 			</div>
@@ -157,6 +160,13 @@ export default {
 		},
 		addToCart() {
 			if(this.size){
+				if (this.size.quantity < this.quantity) {
+					document.getElementById('size-fail').style.display = 'block';
+					setTimeout(function() {
+						$('#size-fail').fadeOut(1000)
+					}, 3000)
+					return;
+				}
 				let ss_storage ={
 					id: this.product_id,
 					image: this.detail.image,
@@ -190,7 +200,7 @@ export default {
 			let count = 0;
 			if(this.$session.exists()){
 				Object.keys(this.$session.getAll()).forEach(function(key) {
-					if(key != 'session-id' && key != 'cartCount')
+					if(key != 'session-id' && key != 'cartCount' && key != 'billId')
 						count++;
 				});
 			}
