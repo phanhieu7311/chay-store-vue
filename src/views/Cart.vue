@@ -123,7 +123,7 @@ export default {
 	methods: {
 		loadSession(){
 			Object.keys(this.$session.getAll()).forEach(key => {
-				if(key != 'session-id' && key != 'cartCount'){
+				if(key != 'session-id' && key != 'cartCount' && key != 'billId'){
 					this.cart.push(this.$session.get(key));
 					let price = this.$session.get(key).price;
 					this.total += this.moneyToInt(price) * this.$session.get(key).quantity;
@@ -131,7 +131,6 @@ export default {
 			});
 		},
 		moneyToInt(price){
-			// console.log(price);
 			price = price.replace(/,/g,'');
 			price = price.slice(1,price.length);
 			return parseInt(price);
@@ -146,6 +145,9 @@ export default {
 					keys.splice(i , 1);
 				}
 				if (keys[i] == 'cartCount') {
+					keys.splice(i , 1);
+				}
+				if (keys[i] == 'billId') {
 					keys.splice(i , 1);
 				}
 			}
@@ -166,6 +168,9 @@ export default {
 					keys.splice(i , 1);
 				}
 				if (keys[i] == 'cartCount') {
+					keys.splice(i , 1);
+				}
+				if (keys[i] == 'billId') {
 					keys.splice(i , 1);
 				}
 			}
